@@ -18,7 +18,7 @@ interface IProps {
   text: string;
 }
 
-export default function ({ text }: IProps) {
+export default function TextScene({ text }: IProps) {
   const classes = useStyles();
 
   return <div className={classes.root}>{text}</div>;
