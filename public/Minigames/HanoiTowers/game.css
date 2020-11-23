@@ -1,0 +1,38 @@
+.block {
+  position: absolute;
+  border: 1px solid black;
+  border-bottom: none;
+  height: 8vh;
+}
+
+.block.light {
+  background-color: rgb(255, 107, 210);
+}
+
+.block.dark {
+  background-color: #2d191b;
+}
+
+.block.selected {
+  opacity: 50%;
+}
+
+.tableStand {
+  position: absolute;
+  background-color: rgb(145, 82, 0);
+  border: 1px solid black;
+  border-top: none;
+  width: 2vw;
+  height: 40vh;
+  bottom: 6vh;
+}
+
+.tableDesk {
+  position: absolute;
+  bottom: 46vh;
+  height: 4vh;
+  background-color: rgb(145, 82, 0);
+  border: 1px solid black;
+  border-bottom: none;
+  width: 20vw;
+}

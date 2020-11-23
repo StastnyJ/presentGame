@@ -5,7 +5,12 @@ const reconnectTimeout = 2000;
 const host = "stastnyj.duckdns.org";
 const port = 9001;
 
-const game = new Game(() => {});
+const game = new Game(() => {
+  //@ts-ignore
+  const message = new Paho.MQTT.Message("requestController:GameWon");
+  message.destinationName = "presentGameController";
+  mqtt.send(message);
+});
 
 const onConnect = () => {
   mqtt.subscribe("presentGame");

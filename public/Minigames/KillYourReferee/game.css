@@ -1,0 +1,12 @@
+.pointer {
+  position: absolute;
+  border-radius: 50%;
+  width: min(1vw, 1vw);
+  height: min(1vw, 1vw);
+  background-color: red;
+}
+
+.target {
+  position: absolute;
+  width: min(8vw, 8vh);
+}
