@@ -1,4 +1,6 @@
 import React from "react";
 import ImageScene from "../Components/ImageScene";
 
-export default [<ImageScene image="/img/Intro/qr.png" />];
+const Intro = [<ImageScene image="/img/Intro/qr.png" />];
+
+export default Intro;

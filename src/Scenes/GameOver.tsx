@@ -1,3 +1,5 @@
 import React from "react";
 
-export default (sendMessage: (topic: string, msg: string) => void) => [<></>];
+const GameOver = (sendMessage: (topic: string, msg: string) => void) => [<></>];
+
+export default GameOver;
