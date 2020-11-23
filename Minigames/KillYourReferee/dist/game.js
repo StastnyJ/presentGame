@@ -52,7 +52,7 @@ var GameView = /** @class */ (function () {
 var Game = /** @class */ (function () {
     function Game(gameOver) {
         var _this = this;
-        this.pointerSpeedModifier = 0.6;
+        this.pointerSpeedModifier = 0.8;
         this.handleOutOfRange = function () {
             _this.targets.forEach(function (t) {
                 if (t.poistion.x < 0) {
@@ -106,12 +106,13 @@ var Game = /** @class */ (function () {
         this.fire = function () {
             var killed = [];
             _this.targets.forEach(function (t, i) {
-                if (t.poistion.x >= _this.pointer.x && t.poistion.x + 8 <= _this.pointer.x) {
-                    if (t.poistion.y >= _this.pointer.y && t.poistion.y + 8 <= _this.pointer.y) {
+                if (t.poistion.x + 8 >= _this.pointer.x && t.poistion.x <= _this.pointer.x) {
+                    if (t.poistion.y + 8 >= _this.pointer.y && t.poistion.y <= _this.pointer.y) {
                         killed.push(i);
                     }
                 }
             });
+            console.log(_this.pointer, _this.targets.map(function (t) { return t.poistion; }), killed);
             _this.targets = _this.targets.filter(function (_, i) { return !killed.includes(i); });
             killed.forEach(function (i) { return _this.view.removeTarget(i); });
             if (_this.targets.length === 0)
@@ -121,10 +122,10 @@ var Game = /** @class */ (function () {
         this.pointer = { x: 50, y: 50 };
         this.pointerSpeed = { x: 0, y: 0 };
         this.targets = [
-            { image: "ref0", poistion: { x: 20, y: 40 }, speed: { x: 1.5, y: 1 } },
+            { image: "ref0", poistion: { x: 20, y: 40 }, speed: { x: 0.8, y: 0.5 } },
             { image: "ref1", poistion: { x: 60, y: 20 }, speed: { x: -0.4, y: -0.2 } },
-            { image: "ref2", poistion: { x: 10, y: 90 }, speed: { x: 2, y: -2.5 } },
-            { image: "ref3", poistion: { x: 50, y: 10 }, speed: { x: -1.4, y: 0.98 } },
+            { image: "ref2", poistion: { x: 10, y: 90 }, speed: { x: 1, y: -1.2 } },
+            { image: "ref3", poistion: { x: 50, y: 10 }, speed: { x: -0.7, y: 0.48 } },
         ];
         this.view = new GameView(this);
     }
@@ -150,7 +151,6 @@ var mqttConnect = function () {
     mqtt = new Paho.MQTT.Client(host, port, "presentGame");
     mqtt.onMessageArrived = function (message) {
         var msg = message.payloadString;
-        console.log(msg);
         if (msg.startsWith("moveStart:"))
             game.setDirection(msg.replace("moveStart:", ""));
         else if (msg === "moveEnd")

@@ -22,7 +22,6 @@ const mqttConnect = () => {
   mqtt = new Paho.MQTT.Client(host, port, "presentGame");
   mqtt.onMessageArrived = function (message) {
     const msg = message.payloadString as string;
-    console.log(msg);
     if (msg.startsWith("moveStart:")) game.setDirection(msg.replace("moveStart:", "") as "UP" | "DOWN" | "LEFT" | "RIGHT");
     else if (msg === "moveEnd") game.setDirection("STOP");
     else if (msg === "FIRE") game.fire();

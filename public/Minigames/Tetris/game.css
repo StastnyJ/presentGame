@@ -14,3 +14,7 @@
 .block.covered {
   background-color: blue;
 }
+
+.block.pattern {
+  background-color: lightgray;
+}

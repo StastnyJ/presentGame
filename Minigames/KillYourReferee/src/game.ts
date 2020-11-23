@@ -13,17 +13,17 @@ class Game {
   private pointer: position;
   private pointerSpeed: vector;
   private targets: { poistion: position; speed: vector; image: string }[];
-  private readonly pointerSpeedModifier = 0.6;
+  private readonly pointerSpeedModifier = 0.8;
 
   constructor(gameOver: () => void) {
     this.gameOverHandler = gameOver;
     this.pointer = { x: 50, y: 50 };
     this.pointerSpeed = { x: 0, y: 0 };
     this.targets = [
-      { image: "ref0", poistion: { x: 20, y: 40 }, speed: { x: 1.5, y: 1 } },
+      { image: "ref0", poistion: { x: 20, y: 40 }, speed: { x: 0.8, y: 0.5 } },
       { image: "ref1", poistion: { x: 60, y: 20 }, speed: { x: -0.4, y: -0.2 } },
-      { image: "ref2", poistion: { x: 10, y: 90 }, speed: { x: 2, y: -2.5 } },
-      { image: "ref3", poistion: { x: 50, y: 10 }, speed: { x: -1.4, y: 0.98 } },
+      { image: "ref2", poistion: { x: 10, y: 90 }, speed: { x: 1, y: -1.2 } },
+      { image: "ref3", poistion: { x: 50, y: 10 }, speed: { x: -0.7, y: 0.48 } },
     ];
     this.view = new GameView(this);
   }
@@ -81,12 +81,17 @@ class Game {
   fire = () => {
     const killed = [];
     this.targets.forEach((t, i) => {
-      if (t.poistion.x >= this.pointer.x && t.poistion.x + 8 <= this.pointer.x) {
-        if (t.poistion.y >= this.pointer.y && t.poistion.y + 8 <= this.pointer.y) {
+      if (t.poistion.x + 8 >= this.pointer.x && t.poistion.x <= this.pointer.x) {
+        if (t.poistion.y + 8 >= this.pointer.y && t.poistion.y <= this.pointer.y) {
           killed.push(i);
         }
       }
     });
+    console.log(
+      this.pointer,
+      this.targets.map((t) => t.poistion),
+      killed
+    );
     this.targets = this.targets.filter((_, i) => !killed.includes(i));
     killed.forEach((i) => this.view.removeTarget(i));
     if (this.targets.length === 0) this.gameOverHandler();

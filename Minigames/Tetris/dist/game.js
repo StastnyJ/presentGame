@@ -6,7 +6,7 @@ var GameView = /** @class */ (function () {
             for (var x = 0; x < _this.game.width; x++) {
                 for (var y = 0; y < _this.game.height; y++) {
                     var e = document.createElement("div");
-                    e.className = _this.game.isCovered(x, y) ? "block covered" : "block";
+                    e.className = _this.game.isCovered(x, y) ? "block covered" : _this.game.isInPattern(x, y) ? "block pattern" : "block";
                     e.style.left = Math.floor((100 * x) / _this.game.width) + "%";
                     e.style.top = Math.floor((100 * y) / _this.game.height) + "%";
                     e.style.width = Math.floor(100 / _this.game.width) + "%";
@@ -202,8 +202,33 @@ var tileShapes = [
         ],
     ],
 ];
+var patterns = [
+    [
+        "          ",
+        "          ",
+        "          ",
+        "          ",
+        "          ",
+        "          ",
+        "          ",
+        "          ",
+        "          ",
+        "          ",
+        "          ",
+        "          ",
+        "          ",
+        "    ##    ",
+        "   ####   ",
+        "  ######  ",
+        " ######## ",
+        "  ######  ",
+        "  ######  ",
+        "  ######  ",
+    ],
+];
 /// <reference path="./gameView.ts" />
 /// <reference path="./tiles.ts" />
+/// <reference path="./patterns.ts" />
 var Game = /** @class */ (function () {
     function Game(width, height, gameOver) {
         var _this = this;
@@ -229,6 +254,7 @@ var Game = /** @class */ (function () {
                 }
                 _this.breakFullRows();
                 _this.regenerateTile();
+                _this.testPatternFilled();
             }
             return touch;
         };
@@ -237,36 +263,67 @@ var Game = /** @class */ (function () {
             for (var i = 0, toDo = _this.height - _this.fixed.length; i < toDo; i++)
                 _this.fixed.unshift(new Array(_this.width).fill(false));
         };
+        this.testPatternFilled = function () {
+            var covered = true;
+            for (var x = 0; x < _this.width && covered; x++) {
+                for (var y = 0; y < _this.height && covered; y++) {
+                    if (_this.isInPattern(x, y) && !_this.isCovered(x, y))
+                        covered = false;
+                }
+            }
+            if (covered)
+                _this.endGame();
+        };
+        this.endGame = function () {
+            _this.runnign = false;
+            _this.tile = undefined;
+            for (var x = 0; x < _this.width; x++) {
+                for (var y = 0; y < _this.height; y++) {
+                    _this.fixed[y][x] = _this.isInPattern(x, y);
+                }
+            }
+            _this.gameView.draw();
+            _this.gameOver();
+        };
+        this.isInPattern = function (x, y) {
+            return _this.pattern[y][x] === "#";
+        };
         this.isCovered = function (x, y) {
-            return _this.fixed[y][x] || _this.tile.isCovered(x - _this.tilePosition.x, y - _this.tilePosition.y);
+            return _this.fixed[y][x] || (_this.tile && _this.tile.isCovered(x - _this.tilePosition.x, y - _this.tilePosition.y));
         };
         this.move = function (direction) {
-            if (direction === "LEFT") {
-                if (_this.tilePosition.x > 0)
-                    _this.tilePosition.x--;
+            if (_this.runnign) {
+                if (direction === "LEFT") {
+                    if (_this.tilePosition.x > 0)
+                        _this.tilePosition.x--;
+                }
+                else if (direction === "RIGHT") {
+                    if (_this.tilePosition.x + _this.tile.getWidth() < _this.width)
+                        _this.tilePosition.x++;
+                }
+                else if (direction === "DOWN") {
+                    while (!_this.makeFixIfTouch())
+                        _this.tilePosition.y++;
+                }
+                else {
+                    _this.tile.rotate(_this.width - _this.tilePosition.x);
+                    _this.makeFixIfTouch();
+                }
+                _this.gameView.draw();
             }
-            else if (direction === "RIGHT") {
-                if (_this.tilePosition.x + _this.tile.getWidth() < _this.width)
-                    _this.tilePosition.x++;
-            }
-            else if (direction === "DOWN") {
-                while (!_this.makeFixIfTouch())
-                    _this.tilePosition.y++;
-            }
-            else {
-                _this.tile.rotate(_this.width - _this.tilePosition.x);
-                _this.makeFixIfTouch();
-            }
-            _this.gameView.draw();
         };
         this.refresh = function () {
-            _this.tilePosition.y++;
-            _this.makeFixIfTouch();
-            _this.gameView.draw();
+            if (_this.runnign) {
+                _this.tilePosition.y++;
+                _this.makeFixIfTouch();
+                _this.gameView.draw();
+            }
         };
         this.gameOver = gameOver;
         this.width = width;
         this.height = height;
+        this.pattern = patterns[0];
+        this.runnign = true;
         this.fixed = Array(height)
             .fill(0)
             .map(function (_) { return Array(width).fill(false); });

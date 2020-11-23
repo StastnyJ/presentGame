@@ -1,5 +1,6 @@
 /// <reference path="./gameView.ts" />
 /// <reference path="./tiles.ts" />
+/// <reference path="./patterns.ts" />
 
 interface position {
   x: number;
@@ -13,12 +14,16 @@ class Game {
   private gameOver: () => void;
   private fixed: boolean[][];
   private tilePosition: position;
+  private pattern: string[];
+  private runnign: boolean;
   private tile: Tile;
 
   constructor(width: number, height: number, gameOver: () => void) {
     this.gameOver = gameOver;
     this.width = width;
     this.height = height;
+    this.pattern = patterns[0];
+    this.runnign = true;
     this.fixed = Array(height)
       .fill(0)
       .map((_) => Array(width).fill(false));
@@ -48,6 +53,7 @@ class Game {
       }
       this.breakFullRows();
       this.regenerateTile();
+      this.testPatternFilled();
     }
     return touch;
   };
@@ -58,27 +64,57 @@ class Game {
       this.fixed.unshift(new Array(this.width).fill(false));
   };
 
+  private testPatternFilled = () => {
+    let covered = true;
+    for (let x = 0; x < this.width && covered; x++) {
+      for (let y = 0; y < this.height && covered; y++) {
+        if (this.isInPattern(x, y) && !this.isCovered(x, y)) covered = false;
+      }
+    }
+    if (covered) this.endGame();
+  };
+
+  private endGame = () => {
+    this.runnign = false;
+    this.tile = undefined;
+    for (let x = 0; x < this.width; x++) {
+      for (let y = 0; y < this.height; y++) {
+        this.fixed[y][x] = this.isInPattern(x, y);
+      }
+    }
+    this.gameView.draw();
+    this.gameOver();
+  };
+
+  isInPattern = (x: number, y: number) => {
+    return this.pattern[y][x] === "#";
+  };
+
   isCovered = (x: number, y: number) => {
-    return this.fixed[y][x] || this.tile.isCovered(x - this.tilePosition.x, y - this.tilePosition.y);
+    return this.fixed[y][x] || (this.tile && this.tile.isCovered(x - this.tilePosition.x, y - this.tilePosition.y));
   };
 
   move = (direction: "LEFT" | "RIGHT" | "DOWN" | "ROTATE") => {
-    if (direction === "LEFT") {
-      if (this.tilePosition.x > 0) this.tilePosition.x--;
-    } else if (direction === "RIGHT") {
-      if (this.tilePosition.x + this.tile.getWidth() < this.width) this.tilePosition.x++;
-    } else if (direction === "DOWN") {
-      while (!this.makeFixIfTouch()) this.tilePosition.y++;
-    } else {
-      this.tile.rotate(this.width - this.tilePosition.x);
-      this.makeFixIfTouch();
+    if (this.runnign) {
+      if (direction === "LEFT") {
+        if (this.tilePosition.x > 0) this.tilePosition.x--;
+      } else if (direction === "RIGHT") {
+        if (this.tilePosition.x + this.tile.getWidth() < this.width) this.tilePosition.x++;
+      } else if (direction === "DOWN") {
+        while (!this.makeFixIfTouch()) this.tilePosition.y++;
+      } else {
+        this.tile.rotate(this.width - this.tilePosition.x);
+        this.makeFixIfTouch();
+      }
+      this.gameView.draw();
     }
-    this.gameView.draw();
   };
 
   refresh = () => {
-    this.tilePosition.y++;
-    this.makeFixIfTouch();
-    this.gameView.draw();
+    if (this.runnign) {
+      this.tilePosition.y++;
+      this.makeFixIfTouch();
+      this.gameView.draw();
+    }
   };
 }
