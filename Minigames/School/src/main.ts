@@ -24,6 +24,7 @@ const mqttConnect = () => {
     const msg = message.payloadString as string;
     console.log(msg);
     if (msg.startsWith("move:")) game.move(msg.replace("move:", "") as "UP" | "DOWN" | "LEFT" | "RIGHT");
+    if (msg === "FIRE") game.fire();
   };
   mqtt.connect({ onSuccess: onConnect, useSSL: true });
 };

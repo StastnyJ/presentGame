@@ -8,8 +8,6 @@
 
 .player {
   position: absolute;
-  border-radius: 50%;
-  background-color: red;
 }
 
 .field {
@@ -31,4 +29,11 @@
 }
 .field.breezy.stinky {
   background-color: rgb(60, 223, 174);
+}
+
+.arrows {
+  position: absolute;
+  bottom: 2vh;
+  right: 2vw;
+  color: black;
 }

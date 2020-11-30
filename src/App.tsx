@@ -54,6 +54,7 @@ export default function App() {
   // eslint-disable-next-line
   const messageArrived = (msg: string) => {
     if (msg === "NextScene") setSceneIndex(sceneIndex + 1);
+    if (msg === "PrevScene") setSceneIndex(Math.max(sceneIndex - 1, 0));
   };
 
   useEffect(() => {
@@ -61,6 +62,7 @@ export default function App() {
 
     client.on("connect", () => {
       client.subscribe("presentGameLayout");
+      setMqttState("connected");
     });
 
     client.on("disconnect", () => setMqttState("connectionLost"));

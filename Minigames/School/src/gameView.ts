@@ -27,13 +27,23 @@ class GameView {
 
   // TODO orientation
   private drawPlayer = () => {
-    const e = document.createElement("div");
-    e.className = "player";
+    const e = document.createElement("img");
+    e.className = `player`;
+    e.src = `./${this.game.getPlayer().orientation}.png`;
     e.style.left = `${(100 * (this.game.getPlayer().x + 0.2)) / this.game.width}%`;
     e.style.top = `${(100 * (this.game.getPlayer().y + 0.2)) / this.game.height}%`;
     e.style.width = `${60 / this.game.width}%`;
     e.style.height = `${60 / this.game.height}%`;
     this.container.appendChild(e);
+  };
+
+  private drawArrowsCount = () => {
+    const e = document.createElement("div");
+    e.className = "arrows";
+    e.id = "arrowsText";
+    e.innerHTML = "Zbývá šípů: " + this.game.getPlayer().arrows;
+    (document.getElementById("arrowsText") || { remove: () => {} }).remove();
+    document.getElementsByTagName("body")[0].appendChild(e);
   };
 
   private drawRestartText = () => {
@@ -46,6 +56,7 @@ class GameView {
     else {
       this.drawBoard();
       this.drawPlayer();
+      this.drawArrowsCount();
     }
   };
 }

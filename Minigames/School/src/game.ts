@@ -117,6 +117,7 @@ class Game {
           this.worldMap[this.player.y][this.player.x - 1] = "UNDISCOVERED";
       }
     }
+    this.gameView.draw();
   };
 
   move = (dir: direction) => {

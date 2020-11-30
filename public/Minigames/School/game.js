@@ -28,13 +28,22 @@ var GameView = /** @class */ (function () {
         };
         // TODO orientation
         this.drawPlayer = function () {
-            var e = document.createElement("div");
+            var e = document.createElement("img");
             e.className = "player";
+            e.src = "./" + _this.game.getPlayer().orientation + ".png";
             e.style.left = (100 * (_this.game.getPlayer().x + 0.2)) / _this.game.width + "%";
             e.style.top = (100 * (_this.game.getPlayer().y + 0.2)) / _this.game.height + "%";
             e.style.width = 60 / _this.game.width + "%";
             e.style.height = 60 / _this.game.height + "%";
             _this.container.appendChild(e);
+        };
+        this.drawArrowsCount = function () {
+            var e = document.createElement("div");
+            e.className = "arrows";
+            e.id = "arrowsText";
+            e.innerHTML = "Zbývá šípů: " + _this.game.getPlayer().arrows;
+            (document.getElementById("arrowsText") || { remove: function () { } }).remove();
+            document.getElementsByTagName("body")[0].appendChild(e);
         };
         this.drawRestartText = function () {
             _this.container.innerHTML = "ZEMŘEL JSI, VYSTŘEL PRO RESTART";
@@ -46,6 +55,7 @@ var GameView = /** @class */ (function () {
             else {
                 _this.drawBoard();
                 _this.drawPlayer();
+                _this.drawArrowsCount();
             }
         };
         this.game = game;
@@ -158,6 +168,7 @@ var Game = /** @class */ (function () {
                         _this.worldMap[_this.player.y][_this.player.x - 1] = "UNDISCOVERED";
                 }
             }
+            _this.gameView.draw();
         };
         this.move = function (dir) {
             if (_this.player.orientation == dir) {
@@ -218,6 +229,8 @@ var mqttConnect = function () {
         console.log(msg);
         if (msg.startsWith("move:"))
             game.move(msg.replace("move:", ""));
+        if (msg === "FIRE")
+            game.fire();
     };
     mqtt.connect({ onSuccess: onConnect, useSSL: true });
 };
