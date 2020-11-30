@@ -1,0 +1,34 @@
+#gameContent {
+  position: relative;
+  width: min(80vh, 80vw);
+  height: min(80vh, 80vw);
+  margin-left: calc(50vw - min(40vh, 40vw));
+  margin-top: calc(50vh - min(40vh, 40vw));
+}
+
+.player {
+  position: absolute;
+  border-radius: 50%;
+  background-color: red;
+}
+
+.field {
+  position: absolute;
+  border: 1px solid black;
+}
+
+.field.undiscovered {
+  background-color: lightslategrey;
+}
+.field.breezy {
+  background-color: rgb(65, 150, 236);
+}
+.field.stinky {
+  background-color: rgb(36, 121, 19);
+}
+.field.goal {
+  background-color: rgb(211, 181, 13);
+}
+.field.breezy.stinky {
+  background-color: rgb(60, 223, 174);
+}
