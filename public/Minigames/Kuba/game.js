@@ -5,13 +5,14 @@ var GameView = /** @class */ (function () {
         this.drawDesk = function () {
             for (var y = 0; y < _this.game.height; y++) {
                 for (var x = 0; x < _this.game.width; x++) {
-                    var e = document.createElement("div");
+                    var e = document.createElement(_this.game.getValue(x, y) === 0 ? "div" : "img");
                     e.className = "block " + (_this.game.getValue(x, y) === 0 ? "empty" : "");
                     e.style.left = (100 * x) / _this.game.width + "%";
                     e.style.top = (100 * y) / _this.game.height + "%";
                     e.style.width = 100 / _this.game.width + "%";
                     e.style.height = 100 / _this.game.height + "%";
-                    e.innerHTML = _this.game.getValue(x, y) === 0 ? "" : _this.game.getValue(x, y).toString();
+                    if (_this.game.getValue(x, y) > 0)
+                        e.src = "./" + (_this.game.getValue(x, y) - 1) + ".jpg";
                     _this.container.appendChild(e);
                 }
             }

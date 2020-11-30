@@ -1,6 +1,5 @@
 .block {
   position: absolute;
-  background-color: yellow;
   border: 2px solid black;
   display: flex;
   align-items: center;
