@@ -25,7 +25,6 @@ class GameView {
     }
   };
 
-  // TODO orientation
   private drawPlayer = () => {
     const e = document.createElement("img");
     e.className = `player`;

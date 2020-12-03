@@ -12,6 +12,8 @@ import School from "./Scenes/School";
 import Wedding from "./Scenes/Wedding";
 import "./App.css";
 import { createStyles, makeStyles, Theme } from "@material-ui/core";
+import Outro from "./Scenes/Outro";
+import ReactAudioPlayer from "react-audio-player";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -37,11 +39,13 @@ const getScenes = (sendMessage: (channel: string, msg: string) => void) => [
   ...Honza(sendMessage),
   ...Kometa(sendMessage),
   ...GameOver(sendMessage),
+  ...Outro,
 ];
 
 export default function App() {
   const classes = useStyles();
   const [mqttClient, setMqttClient] = useState<MqttClient | undefined>(undefined);
+  const [song, setSong] = useState<string | undefined>(undefined);
   const [mqttState, setMqttState] = useState<appState>("connecting");
   const [sceneIndex, setSceneIndex] = useState(0);
 
@@ -55,6 +59,11 @@ export default function App() {
   const messageArrived = (msg: string) => {
     if (msg === "NextScene") setSceneIndex(sceneIndex + 1);
     if (msg === "PrevScene") setSceneIndex(Math.max(sceneIndex - 1, 0));
+    if (msg.startsWith("RequestSong:")) {
+      if (msg === "RequestSong:STOP") setSong(undefined);
+      else setSong(msg.replace("RequestSong:", ""));
+      setSceneIndex(sceneIndex + 1);
+    }
   };
 
   useEffect(() => {
@@ -84,6 +93,7 @@ export default function App() {
     <>
       <div className={classes.state}>{mqttState}</div>
       {scenes[sceneIndex]}
+      {song && <ReactAudioPlayer src={`/music/${song}.mp3`} autoPlay loop />}
     </>
   );
 }
