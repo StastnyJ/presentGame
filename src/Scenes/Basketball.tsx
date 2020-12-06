@@ -10,7 +10,7 @@ const images = ["1.jpg", "0.jpg", "2.jpg", "3.jpg", "4.jpg", "7.jpg", "6.jpg", "
 
 const Basketball = (sendMessage: (topic: string, msg: string) => void) => [
   <SongStarter songName="STOP" sendMessage={sendMessage} />,
-  <TextScene text="Nějaká úvodní řeč o tom jak chodil na basket bla, bla, bla" />,
+  <TextScene text="SPORTOVEC A FRAJER" />,
   <SongStarter songName="Amerika" sendMessage={sendMessage} />,
   <GameScene sendMessage={sendMessage} controllerName="Basketball" gameName="Basketball" />,
   ...images.map((img) => <ImageScene image={`${imagesPath}/${img}`} />),

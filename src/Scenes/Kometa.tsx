@@ -10,7 +10,7 @@ const images = ["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg"];
 
 const Kometa = (sendMessage: (topic: string, msg: string) => void) => [
   <SongStarter sendMessage={sendMessage} songName="STOP" />,
-  <TextScene text="Nějaká úvodní řeč o Kometě bla, bla, bla" />,
+  <TextScene text="KOMEŤÁK TĚLEM I DUŠÍ" />,
   <SongStarter sendMessage={sendMessage} songName="odaNaKometu" />,
   <GameScene sendMessage={sendMessage} controllerName="KillYourReferee" gameName="KillYourReferee" />,
   ...images.map((img) => <ImageScene image={`${imagesPath}/${img}`} />),

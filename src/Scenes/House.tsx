@@ -10,7 +10,7 @@ const images = ["1.jpg", "0.jpg", "2.jpg", "3.jpg"];
 
 const House = (sendMessage: (topic: string, msg: string) => void) => [
   <SongStarter sendMessage={sendMessage} songName="STOP" />,
-  <TextScene text="Nějaká úvodní řeč o stavbě baráku bla, bla, bla" />,
+  <TextScene text="PAK VYROSTL DOMEČEK" />,
   <SongStarter sendMessage={sendMessage} songName="patAMat" />,
   <GameScene sendMessage={sendMessage} controllerName="Tetris" gameName="Tetris" />,
   ...images.map((img) => <ImageScene image={`${imagesPath}/${img}`} />),

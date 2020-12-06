@@ -5,8 +5,9 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       display: "flex",
+      height: "100vh",
       fontFamily: "Roboto",
-      fontSize: "1.8rem",
+      fontSize: "2.5rem",
       alignContent: "center",
       alignItems: "center",
       justifyContent: "center",

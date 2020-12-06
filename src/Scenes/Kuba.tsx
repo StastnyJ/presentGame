@@ -10,7 +10,7 @@ const images = ["1.jpg", "2.jpg", "4.jpg", "3.jpg", "5.jpg", "6.jpg"];
 
 const Kuba = (sendMessage: (topic: string, msg: string) => void) => [
   <SongStarter sendMessage={sendMessage} songName="STOP" />,
-  <TextScene text="Nějaká úvodní řeč o tom že se narodil Kuba bla, bla, bla" />,
+  <TextScene text="31.3.2000 SE NARODIL PRVNÍ SYN KUBÍK" />,
   <SongStarter sendMessage={sendMessage} songName="IWillDerive" />,
   <GameScene controllerName="Kuba" gameName="Kuba" sendMessage={sendMessage} />,
   ...images.map((img) => <ImageScene image={`${imagesPath}/${img}`} />),

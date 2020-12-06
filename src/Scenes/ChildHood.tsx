@@ -1,10 +1,15 @@
 import React from "react";
+import ImageScene from "../Components/ImageScene";
 import TextScene from "../Components/TextScene";
 
+const imagesPath = "/img/ChildHood";
+
+const images = ["2.png", "1.png", "0.png", "3.png", "4.png"];
+
 const ChildHood = (sendMessage: (topic: string, msg: string) => void) => [
-  <TextScene text="Nějaká úvodní řeč o tom že se narodil bla, bla, bla" />,
+  <TextScene text="14.12.1970 SE NARODIL KLUČÍK VRATÍK" />,
   <TextScene text="Nějaká hra o dětství, musí se vymyslet" />,
-  <TextScene text="Fotky z dětství" />,
+  ...images.map((img) => <ImageScene image={`${imagesPath}/${img}`} />),
 ];
 
 export default ChildHood;
