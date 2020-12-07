@@ -6,7 +6,7 @@ import TextScene from "../Components/TextScene";
 
 const imagesPath = "/img/Honza";
 
-const images = ["1.jpg", "0.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg"];
+const images = ["1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg"];
 
 const Honza = (sendMessage: (topic: string, msg: string) => void) => [
   <SongStarter sendMessage={sendMessage} songName="STOP" />,
