@@ -9,7 +9,7 @@ const images = ["2.png", "1.png", "0.png", "3.png", "4.png"];
 
 const ChildHood = (sendMessage: (topic: string, msg: string) => void) => [
   <TextScene text="14.12.1970 SE NARODIL KLUČÍK VRATÍK" />,
-  <GameScene controllerName="Swapping" gameName="ChilgHood" sendMessage={sendMessage} />,
+  <GameScene controllerName="Swapping" gameName="ChildHood" sendMessage={sendMessage} />,
   ...images.map((img) => <ImageScene image={`${imagesPath}/${img}`} />),
 ];
 
