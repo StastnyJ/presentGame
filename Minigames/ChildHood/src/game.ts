@@ -1,119 +1,104 @@
 /// <reference path="./gameView.ts" />
-/// <reference path="./tiles.ts" />
-/// <reference path="./patterns.ts" />
 
-interface position {
+interface IPosition {
   x: number;
   y: number;
+  speed: number;
 }
-
 class Game {
   private gameView: GameView;
-  public readonly width: number;
-  public readonly height: number;
   private gameOver: () => void;
-  private fixed: boolean[][];
-  private tilePosition: position;
-  private pattern: string[];
-  private runnign: boolean;
-  private tile: Tile;
+  private toiletPosition: IPosition;
+  private poops: IPosition[];
+  private score: number;
+  private nextSpawnProb: number;
+  private running: boolean;
 
-  constructor(width: number, height: number, gameOver: () => void) {
+  private readonly toiletSpeedModifier = 2;
+  private readonly poopSpeedModifier = 1.8;
+  private readonly spawnModifier = 0.05;
+
+  constructor(gameOver: () => void) {
     this.gameOver = gameOver;
-    this.width = width;
-    this.height = height;
-    this.pattern = patterns[0];
-    this.runnign = true;
-    this.fixed = Array(height)
-      .fill(0)
-      .map((_) => Array(width).fill(false));
+    this.poops = [];
+    this.toiletPosition = { x: 40, y: 92, speed: this.toiletSpeedModifier };
+    this.score = 0;
+    this.running = true;
+    this.nextSpawnProb = 1;
     this.gameView = new GameView(this);
-    this.regenerateTile();
     this.gameView.draw();
   }
 
-  private regenerateTile = () => {
-    this.tilePosition = { x: Math.floor(this.width / 2), y: 0 };
-    this.tile = new Tile();
+  private movePoops = () => {
+    this.poops = this.poops.map((p) => {
+      return { ...p, y: p.y + p.speed };
+    });
   };
 
-  private makeFixIfTouch = () => {
-    let touch = this.tilePosition.y + this.tile.getHeight() > this.height;
-    for (let x = 0; x < this.tile.getWidth() && !touch; x++) {
-      for (let y = 0; y < this.tile.getHeight() && !touch; y++) {
-        if (this.fixed[y + this.tilePosition.y][x + this.tilePosition.x] && this.tile.isCovered(x, y)) touch = true;
+  private spawnPoop = () => {
+    if (Math.random() < this.nextSpawnProb) {
+      this.nextSpawnProb = 0;
+      this.poops.push({ x: Math.floor(92 * Math.random()), y: 0, speed: Math.random() * this.poopSpeedModifier });
+    } else {
+      this.nextSpawnProb += this.spawnModifier;
+    }
+  };
+
+  private handleCollisions = () => {
+    this.handleToiletePoopsCollisions();
+    this.handleFloorPoopsCollisions();
+  };
+
+  private handleToiletePoopsCollisions = () => {
+    for (let i = 0; i < this.poops.length; i++) {
+      if (
+        this.poops[i].y >= 88 &&
+        this.poops[i].x >= this.toiletPosition.x &&
+        this.poops[i].x + 8 <= this.toiletPosition.x + 22
+      ) {
+        this.gameView.hidePoop(i);
+        this.poops[i] = { x: -10, y: -10, speed: 0 };
+        this.score += 1;
       }
     }
-    if (touch) {
-      this.tilePosition.y--;
-      for (let x = 0; x < this.tile.getWidth(); x++) {
-        for (let y = 0; y < this.tile.getHeight(); y++) {
-          if (this.tile.isCovered(x, y)) this.fixed[y + this.tilePosition.y][x + this.tilePosition.x] = true;
-        }
-      }
-      this.breakFullRows();
-      this.regenerateTile();
-      this.testPatternFilled();
-    }
-    return touch;
   };
 
-  private breakFullRows = () => {
-    this.fixed = this.fixed.filter((r) => !r.reduce((a, acc) => acc && a, true));
-    for (let i = 0, toDo = this.height - this.fixed.length; i < toDo; i++)
-      this.fixed.unshift(new Array(this.width).fill(false));
-  };
-
-  private testPatternFilled = () => {
-    let covered = true;
-    for (let x = 0; x < this.width && covered; x++) {
-      for (let y = 0; y < this.height && covered; y++) {
-        if (this.isInPattern(x, y) && !this.isCovered(x, y)) covered = false;
+  private handleFloorPoopsCollisions = () => {
+    for (let i = 0; i < this.poops.length; i++) {
+      if (this.poops[i].y >= 96) {
+        this.gameView.hidePoop(i);
+        this.poops[i] = { x: -10, y: -10, speed: 0 };
+        this.score -= 1;
       }
     }
-    if (covered) this.endGame();
   };
 
-  private endGame = () => {
-    this.runnign = false;
-    this.tile = undefined;
-    for (let x = 0; x < this.width; x++) {
-      for (let y = 0; y < this.height; y++) {
-        this.fixed[y][x] = this.isInPattern(x, y);
-      }
-    }
-    this.gameView.draw();
-    this.gameOver();
+  getPoops = () => [...this.poops];
+
+  getToilette = () => {
+    return { ...this.toiletPosition };
   };
 
-  isInPattern = (x: number, y: number) => {
-    return this.pattern[y][x] === "#";
-  };
+  getScore = () => this.score;
 
-  isCovered = (x: number, y: number) => {
-    return this.fixed[y][x] || (this.tile && this.tile.isCovered(x - this.tilePosition.x, y - this.tilePosition.y));
-  };
+  changeDirection = () => (this.toiletPosition.speed *= -1);
 
-  move = (direction: "LEFT" | "RIGHT" | "DOWN" | "ROTATE") => {
-    if (this.runnign) {
-      if (direction === "LEFT") {
-        if (this.tilePosition.x > 0) this.tilePosition.x--;
-      } else if (direction === "RIGHT") {
-        if (this.tilePosition.x + this.tile.getWidth() < this.width) this.tilePosition.x++;
-      } else if (direction === "DOWN") {
-        while (!this.makeFixIfTouch()) this.tilePosition.y++;
-      } else {
-        this.tile.rotate(this.width - this.tilePosition.x);
-        this.makeFixIfTouch();
-      }
-      this.gameView.draw();
-    }
+  moveToilette = () => {
+    this.toiletPosition.x += this.toiletPosition.speed;
+    if (this.toiletPosition.x <= 0) this.toiletPosition.speed = Math.abs(this.toiletPosition.speed);
+    if (this.toiletPosition.x >= 78) this.toiletPosition.speed = -Math.abs(this.toiletPosition.speed);
   };
 
   refresh = () => {
-    if (this.runnign) {
-      this.tilePosition.y++;
-      this.makeFixIfTouch();
+    if (this.running) {
+      this.movePoops();
+      this.moveToilette();
+      this.handleCollisions();
+      this.spawnPoop();
+      if (this.score >= 32) {
+        this.running = false;
+        this.gameOver();
+      }
       this.gameView.draw();
     }
   };

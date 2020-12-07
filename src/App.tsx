@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { MqttClient, connect } from "mqtt";
 import Basketball from "./Scenes/Basketball";
 import ChildHood from "./Scenes/ChildHood";
-import GameOver from "./Scenes/GameOver";
 import Honza from "./Scenes/Honza";
 import House from "./Scenes/House";
 import Intro from "./Scenes/Intro";
@@ -38,7 +37,6 @@ const getScenes = (sendMessage: (channel: string, msg: string) => void) => [
   ...House(sendMessage),
   ...Honza(sendMessage),
   ...Kometa(sendMessage),
-  ...GameOver(sendMessage),
   ...Outro,
 ];
 
@@ -62,6 +60,7 @@ export default function App() {
     if (msg.startsWith("RequestSong:")) {
       if (msg === "RequestSong:STOP") setSong(undefined);
       else setSong(msg.replace("RequestSong:", ""));
+      if (sceneIndex + 1 === scenes.length - 1) sendMessage("presentGameController", "requestController:GameOver");
       setSceneIndex(sceneIndex + 1);
     }
   };
