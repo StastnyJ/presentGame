@@ -12,20 +12,29 @@ class GameView {
   private drawDesk = () => {
     for (let y = 0; y < this.game.height; y++) {
       for (let x = 0; x < this.game.width; x++) {
-        const e = document.createElement(this.game.getValue(x, y) === 0 ? "div" : "img");
-        e.className = `block ${this.game.getValue(x, y) === 0 ? "empty" : ""}`;
-        e.style.left = `${(100 * x) / this.game.width}%`;
-        e.style.top = `${(100 * y) / this.game.height}%`;
-        e.style.width = `${100 / this.game.width}%`;
-        e.style.height = `${100 / this.game.height}%`;
-        if (this.game.getValue(x, y) > 0) (e as HTMLImageElement).src = `./${this.game.getValue(x, y) - 1}.jpg`;
-        this.container.appendChild(e);
+        if (this.game.getValue(x, y) !== "VISIBLE") {
+          const e = document.createElement("div");
+          e.className = `block${this.game.getValue(x, y) === "SOLID" ? " solid" : ""}`;
+          e.style.left = `${x * 5}%`;
+          e.style.top = `${y * 4}%`;
+          this.container.appendChild(e);
+        }
       }
     }
+  };
+
+  private drawPlayer = () => {
+    const { x, y } = this.game.getPlayer();
+    const e = document.createElement("div");
+    e.className = "player";
+    e.style.left = `${x * 5 + 1}%`;
+    e.style.top = `${y * 4 + 0.8}%`;
+    this.container.appendChild(e);
   };
 
   draw = () => {
     this.clear();
     this.drawDesk();
+    this.drawPlayer();
   };
 }

@@ -1,4 +1,5 @@
 /// <reference path="./gameView.ts" />
+/// <reference path="./map.ts" />
 
 interface position {
   x: number;
@@ -7,78 +8,59 @@ interface position {
 
 class Game {
   private gameOverHandler: () => void;
-  private board: number[][];
+  private board: ("SOLID" | "HIDDEN" | "VISIBLE")[][];
   private gameView: GameView;
-  readonly width: number;
-  readonly height: number;
+  private playerPosition: position;
 
-  constructor(width: number, height: number, gameOver: () => void) {
+  readonly width = map[0].length;
+  readonly height = map.length;
+
+  constructor(gameOver: () => void) {
     this.gameOverHandler = gameOver;
     this.board = [];
-    for (let y = 0; y < height; y++) {
+    for (let y = 0; y < this.height; y++) {
       this.board.push([]);
-      for (let x = 0; x < width; x++) {
-        this.board[y].push(x + width * y + 1);
+      for (let x = 0; x < this.width; x++) {
+        this.board[y].push(map[y][x] === "#" ? "SOLID" : "HIDDEN");
       }
     }
-    this.board[height - 1][width - 1] = 0;
-    this.width = width;
-    this.height = height;
-    this.shuffleBoard();
+    this.board[0][0] = "VISIBLE";
+    this.playerPosition = { x: 0, y: 0 };
     this.gameView = new GameView(this);
     this.gameView.draw();
   }
 
-  private swap = (a: position, b: position) => {
-    const tmp = this.board[a.y][a.x];
-    this.board[a.y][a.x] = this.board[b.y][b.x];
-    this.board[b.y][b.x] = tmp;
-  };
-
-  private getEmptySpace = () => {
-    for (let y = 0; y < this.height; y++) {
-      for (let x = 0; x < this.width; x++) {
-        if (this.board[y][x] === 0) return { x: x, y: y } as position;
-      }
-    }
-    return { x: -1, y: -1 } as position;
-  };
-
-  private shuffleBoard = () => {
-    const moves = ["UP", "DOWN", "LEFT", "RIGHT"] as ("UP" | "DOWN" | "LEFT" | "RIGHT")[];
-    for (let i = 0; i < 100000; i++) this.rawMove(moves[Math.floor(4 * Math.random())]);
-  };
-
   private rawMove = (dir: "UP" | "DOWN" | "LEFT" | "RIGHT") => {
-    const emptySpace = this.getEmptySpace();
-    if (dir === "DOWN") {
-      if (emptySpace.y < this.height - 1) this.swap(emptySpace, { x: emptySpace.x, y: emptySpace.y + 1 });
-    } else if (dir === "UP") {
-      if (emptySpace.y > 0) this.swap(emptySpace, { x: emptySpace.x, y: emptySpace.y - 1 });
-    } else if (dir === "LEFT") {
-      if (emptySpace.x > 0) this.swap(emptySpace, { x: emptySpace.x - 1, y: emptySpace.y });
-    } else if (dir === "RIGHT") {
-      if (emptySpace.x < this.width - 1) this.swap(emptySpace, { x: emptySpace.x + 1, y: emptySpace.y });
+    const speed: position =
+      dir === "UP" ? { x: 0, y: -1 } : dir === "DOWN" ? { x: 0, y: 1 } : dir === "LEFT" ? { x: -1, y: 0 } : { x: 1, y: 0 };
+    while (true) {
+      if (this.playerPosition.x + speed.x < 0) return;
+      if (this.playerPosition.x + speed.x >= this.width) return;
+      if (this.playerPosition.y + speed.y < 0) return;
+      if (this.playerPosition.y + speed.y >= this.height) return;
+      if (this.board[this.playerPosition.y + speed.y][this.playerPosition.x + speed.x] === "SOLID") return;
+      this.playerPosition.x += speed.x;
+      this.playerPosition.y += speed.y;
+      this.board[this.playerPosition.y][this.playerPosition.x] = "VISIBLE";
     }
   };
 
   private testWin = () => {
-    let ok = true;
-    for (let y = 0; y < this.height && ok; y++) {
-      for (let x = 0; x < this.width && ok; x++) {
-        if (this.board[y][x] !== x + this.width * y + 1 && this.board[y][x] !== 0) ok = false;
-      }
+    if (this.board.filter((r) => r.includes("HIDDEN")).length === 0) {
+      this.gameOverHandler();
+      this.board = this.board.map((r) => r.map((_) => "VISIBLE"));
     }
-    if (ok) this.gameOverHandler();
   };
 
-  getValue = (x: number, y: number) => {
-    return this.board[y][x];
+  getValue = (x: number, y: number) => this.board[y][x];
+
+  getPlayer = () => {
+    return { ...this.playerPosition };
   };
 
   move = (dir: "UP" | "DOWN" | "LEFT" | "RIGHT") => {
     this.rawMove(dir);
-    this.gameView.draw();
     this.testWin();
+    this.gameView.draw();
   };
 }
