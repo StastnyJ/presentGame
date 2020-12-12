@@ -11,6 +11,9 @@ const useStyles = makeStyles((theme: Theme) =>
       alignContent: "center",
       alignItems: "center",
       justifyContent: "center",
+      paddingLeft: "4vw",
+      paddingRight: "4vw",
+      textAlign: "justify",
     },
   })
 );

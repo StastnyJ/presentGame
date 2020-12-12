@@ -37,7 +37,7 @@ const getScenes = (sendMessage: (channel: string, msg: string) => void) => [
   ...House(sendMessage),
   ...Honza(sendMessage),
   ...Kometa(sendMessage),
-  ...Outro,
+  ...Outro(sendMessage),
 ];
 
 export default function App() {
